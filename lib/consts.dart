@@ -1,7 +1,7 @@
 class AppConstants {
   static const String appName = 'Rick & Morty';
-  static const int charactersNum = 25;
-  static const unknownDataStr = 'unknown';
+  static const int charactersNumToDisplay = 25;
+  static const unknownDataPlaceholder = 'unknown';
 }
 
 class RickAndMortyApiConstants {

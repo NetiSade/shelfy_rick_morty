@@ -1,7 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:shelfy/consts.dart';
+import 'package:get_it/get_it.dart';
 
+import '../consts.dart';
 import '../models/character.dart';
 import '../services/api_service.dart';
 
@@ -19,13 +20,15 @@ class CharacterPage extends StatelessWidget {
           child: ListView(
             children: [
               Align(
-                  alignment: AlignmentDirectional.centerStart,
-                  child: IconButton(
-                      onPressed: Navigator.of(context).pop,
-                      icon: Icon(
-                        Icons.arrow_back_ios_outlined,
-                        color: Theme.of(context).primaryColor,
-                      ))),
+                alignment: AlignmentDirectional.centerStart,
+                child: IconButton(
+                  onPressed: Navigator.of(context).pop,
+                  icon: Icon(
+                    Icons.arrow_back_ios_outlined,
+                    color: Theme.of(context).primaryColor,
+                  ),
+                ),
+              ),
               Center(
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
@@ -34,45 +37,47 @@ class CharacterPage extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        '${character.name}',
+                        '${character.name ?? AppConstants.unknownDataPlaceholder}',
                         textAlign: TextAlign.center,
                         style: Theme.of(context)
                             .textTheme
                             .headline4!
                             .copyWith(color: Theme.of(context).primaryColor),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 16.0),
-                        child: Hero(
-                          tag: character.id!,
-                          child: CachedNetworkImage(
-                            fit: BoxFit.cover,
-                            imageUrl: character.image!,
-                            progressIndicatorBuilder:
-                                (context, url, downloadProgress) => Container(),
-                            errorWidget: (context, url, error) =>
-                                Icon(Icons.error),
+                      if (character.image != null)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 16.0),
+                          child: Hero(
+                            tag: character.id,
+                            child: CachedNetworkImage(
+                              fit: BoxFit.cover,
+                              imageUrl: character.image!,
+                              progressIndicatorBuilder:
+                                  (context, url, downloadProgress) =>
+                                      Container(),
+                              errorWidget: (context, url, error) =>
+                                  Icon(Icons.error),
+                            ),
                           ),
                         ),
-                      ),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Text(
-                              'STATUS: ${character.status ?? AppConstants.unknownDataStr}',
+                              'STATUS: ${character.status ?? AppConstants.unknownDataPlaceholder}',
                               style: Theme.of(context).textTheme.subtitle1,
                             ),
                             SizedBox(
                               height: 16,
                             ),
-                            _buildLocationView(
+                            _buildLocationColumn(
                                 'ORIGIN', character.origin, context),
                             SizedBox(
                               height: 16,
                             ),
-                            _buildLocationView(
+                            _buildLocationColumn(
                                 'LOCATION', character.location, context),
                           ],
                         ),
@@ -88,12 +93,12 @@ class CharacterPage extends StatelessWidget {
     );
   }
 
-  Widget _buildLocationView(String locationTitle,
+  Widget _buildLocationColumn(String locationTitle,
       LocationDetails? locationDetails, BuildContext context) {
     return Column(
       children: [
         Text(
-          '$locationTitle: ${locationDetails?.name ?? AppConstants.unknownDataStr}',
+          '$locationTitle: ${locationDetails?.name ?? AppConstants.unknownDataPlaceholder}',
           style: Theme.of(context).textTheme.subtitle1,
         ),
         SizedBox(
@@ -120,7 +125,7 @@ class LocationWidget extends StatefulWidget {
 }
 
 class _LocationWidgetState extends State<LocationWidget> {
-  final _apiService = ApiService();
+  final _apiService = GetIt.I<ApiService>();
   String? _locationType;
   String? _locationDimension;
 
@@ -132,8 +137,9 @@ class _LocationWidgetState extends State<LocationWidget> {
         if (snapshot.connectionState == ConnectionState.done) {
           return Column(
             children: [
-              Text('Type: ${_locationType ?? ''}'),
-              Text('Dimension: ${_locationDimension ?? ''}'),
+              Text('Type: ${_locationType ?? AppConstants.unknownDataPlaceholder}'),
+              Text(
+                  'Dimension: ${_locationDimension ?? AppConstants.unknownDataPlaceholder}'),
             ],
           );
         }
@@ -151,14 +157,17 @@ class _LocationWidgetState extends State<LocationWidget> {
   }
 
   Future<void> _getLocation() async {
+    if (widget.locationUrl == null) {
+      print('_getLocation didnt start. locationUrl is null');
+      return;
+    }
+
     try {
       final location = await _apiService.getLocation(widget.locationUrl!);
-      _locationType = location.type ?? AppConstants.unknownDataStr;
-      _locationDimension = location.dimension ?? AppConstants.unknownDataStr;
+      _locationType = location.type;
+      _locationDimension = location.dimension;
     } catch (e) {
       print('_getLocation failed. error: $e');
-      _locationType = AppConstants.unknownDataStr;
-      _locationDimension = AppConstants.unknownDataStr;
     }
   }
 }

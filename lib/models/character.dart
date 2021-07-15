@@ -2,9 +2,12 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'character.g.dart';
 
+//The class from the API contain more properties we didnt use in the app,
+//for more details check the API docs: https://rickandmortyapi.com/documentation/
+
 @JsonSerializable()
 class Character {
-  final int? id;
+  final int id;
   final String? name;
   final String? status;
   final String? image;

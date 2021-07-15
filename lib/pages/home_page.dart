@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 
 import '../consts.dart';
 import '../models/character.dart';
@@ -14,12 +15,13 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final _apiService = ApiService();
+  final _apiService = GetIt.I<ApiService>();
   List<Character>? _characters;
   bool _loading = true;
 
   @override
   void initState() {
+    //fetch data from server:
     _getCharacters();
     super.initState();
   }
@@ -46,7 +48,8 @@ class _HomePageState extends State<HomePage> {
         child: CircularProgressIndicator(),
       );
     }
-    if (_characters == null || _characters!.length == 0) {
+    //if loading is finished and data == null, we know the loading has failed for some reason
+    if (_characters == null) {
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -55,6 +58,7 @@ class _HomePageState extends State<HomePage> {
         ],
       );
     }
+    //loading is finished and we have the data
     return _buildList();
   }
 
@@ -79,26 +83,34 @@ class _HomePageState extends State<HomePage> {
                   );
                 },
                 title: Text(
-                  character.name!,
-                  style: Theme.of(context).textTheme.headline6,
+                  character.name ?? AppConstants.unknownDataPlaceholder,
+                  style: Theme.of(context)
+                      .textTheme
+                      .headline6!
+                      .copyWith(color: Theme.of(context).primaryColor),
                   overflow: TextOverflow.ellipsis,
                 ),
                 subtitle: Text(
-                  'status: ' + character.status!,
+                  'Status: ${character.status ?? AppConstants.unknownDataPlaceholder}',
                   style: Theme.of(context).textTheme.subtitle1,
                 ),
-                trailing: Hero(
-                  tag: character.id!,
-                  child: CachedNetworkImage(
-                    fit: BoxFit.fitHeight,
-                    imageUrl: character.image!,
-                    placeholder: (context, url) => CircularProgressIndicator(
-                      strokeWidth: 1,
-                      color: Colors.grey,
-                    ),
-                    errorWidget: (context, url, error) => Icon(Icons.error),
-                  ),
-                ),
+                //Hero animation for better UX in the navigation
+                trailing: character.image != null
+                    ? Hero(
+                        tag: character.id,
+                        child: CachedNetworkImage(
+                          fit: BoxFit.fitHeight,
+                          imageUrl: character.image!,
+                          placeholder: (context, url) =>
+                              CircularProgressIndicator(
+                            strokeWidth: 1,
+                            color: Colors.grey,
+                          ),
+                          errorWidget: (context, url, error) =>
+                              Icon(Icons.error),
+                        ),
+                      )
+                    : null,
               ),
             );
           },
@@ -112,7 +124,7 @@ class _HomePageState extends State<HomePage> {
       _loading = true;
     });
 
-    final ids = _getRandomIds(AppConstants.charactersNum);
+    final ids = _getRandomIds(AppConstants.charactersNumToDisplay);
 
     try {
       _characters = await _apiService.getCharacters(ids.toList());
@@ -127,11 +139,11 @@ class _HomePageState extends State<HomePage> {
 
   Set<int> _getRandomIds(int amount) {
     final rand = Random();
-    final numbers = Set<int>();
-    while (numbers.length < amount) {
+    final ids = Set<int>();
+    while (ids.length < amount) {
       final id = rand.nextInt(RickAndMortyApiConstants.maxCharacterId);
-      numbers.add(id);
+      ids.add(id);
     }
-    return numbers;
+    return ids;
   }
 }

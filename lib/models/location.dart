@@ -2,6 +2,9 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'location.g.dart';
 
+//The class from the API contain more properties we didnt use in the app,
+//for more details check the API docs: https://rickandmortyapi.com/documentation/
+
 @JsonSerializable()
 class Location {
   final String? name;
