@@ -1,10 +1,9 @@
-import 'dart:math';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
 import '../consts.dart';
+import '../helper/random_helper.dart';
 import '../models/character.dart';
 import '../services/api_service.dart';
 import 'character_page.dart';
@@ -124,7 +123,10 @@ class _HomePageState extends State<HomePage> {
       _loading = true;
     });
 
-    final ids = _getRandomIds(AppConstants.charactersNumToDisplay);
+    final ids = RandomHelper().getSetOfRandNumbers(
+      max: RickAndMortyApiConstants.maxCharacterId,
+      amount: AppConstants.charactersNumToDisplay,
+    );
 
     try {
       _characters = await _apiService.getCharacters(ids.toList());
@@ -135,15 +137,5 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       _loading = false;
     });
-  }
-
-  Set<int> _getRandomIds(int amount) {
-    final rand = Random();
-    final ids = Set<int>();
-    while (ids.length < amount) {
-      final id = rand.nextInt(RickAndMortyApiConstants.maxCharacterId);
-      ids.add(id);
-    }
-    return ids;
   }
 }
