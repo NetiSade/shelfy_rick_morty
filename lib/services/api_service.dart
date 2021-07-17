@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:convert';
 import 'dart:io';
 
@@ -8,6 +9,8 @@ import '../models/character.dart';
 import '../models/location.dart';
 
 class ApiService {
+  final HashMap<int, Location> locationsMap = HashMap();
+
   Future<List<Character>> getCharacters(List<int> idList) async {
     try {
       final charactersData = await _get(
@@ -25,9 +28,25 @@ class ApiService {
 
   Future<Location> getLocation(String locationUrl) async {
     try {
+      final validUrlPrefix = 'https://rickandmortyapi.com/api/location/';
+
+      if (locationUrl.isEmpty || !locationUrl.startsWith(validUrlPrefix)) {
+        throw Exception('Invalid location URL: $locationUrl');
+      }
+
+      final locationIdStr = locationUrl.substring(validUrlPrefix.length);
+
+      final locationId = int.parse(locationIdStr);
+
+      if (locationsMap.containsKey(locationId)) {
+        return locationsMap[locationId]!;
+      }
+
       final locationData = await _get(locationUrl);
 
       final location = Location.fromJson(locationData);
+
+      locationsMap[location.id] = location;
 
       return location;
     } catch (e) {
