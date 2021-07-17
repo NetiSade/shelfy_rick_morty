@@ -137,7 +137,8 @@ class _LocationWidgetState extends State<LocationWidget> {
         if (snapshot.connectionState == ConnectionState.done) {
           return Column(
             children: [
-              Text('Type: ${_locationType ?? AppConstants.unknownDataPlaceholder}'),
+              Text(
+                  'Type: ${_locationType ?? AppConstants.unknownDataPlaceholder}'),
               Text(
                   'Dimension: ${_locationDimension ?? AppConstants.unknownDataPlaceholder}'),
             ],
@@ -157,8 +158,8 @@ class _LocationWidgetState extends State<LocationWidget> {
   }
 
   Future<void> _getLocation() async {
-    if (widget.locationUrl == null) {
-      print('_getLocation didnt start. locationUrl is null');
+    if (widget.locationUrl == null || widget.locationUrl!.isEmpty) {
+      print('_getLocation didnt start. locationUrl is null or empty');
       return;
     }
 

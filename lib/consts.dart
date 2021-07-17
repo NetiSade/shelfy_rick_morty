@@ -8,4 +8,6 @@ class RickAndMortyApiConstants {
   static const int maxCharacterId = 671;
   static const String charactersBaseUrl =
       'https://rickandmortyapi.com/api/character';
+  static const String locationBaseUrl =
+      'https://rickandmortyapi.com/api/location/';
 }
