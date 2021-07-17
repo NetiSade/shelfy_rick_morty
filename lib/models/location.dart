@@ -7,13 +7,11 @@ part 'location.g.dart';
 
 @JsonSerializable()
 class Location {
-  final int id;
   final String? name;
   final String? type;
   final String? dimension;
 
   Location(
-    this.id,
     this.name,
     this.type,
     this.dimension,

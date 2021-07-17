@@ -9,7 +9,7 @@ import '../models/character.dart';
 import '../models/location.dart';
 
 class ApiService {
-  final HashMap<int, Location> locationsMap = HashMap();
+  final HashMap<int, Location> _locationsCache = HashMap();
 
   Future<List<Character>> getCharacters(List<int> idList) async {
     try {
@@ -28,25 +28,28 @@ class ApiService {
 
   Future<Location> getLocation(String locationUrl) async {
     try {
-      final validUrlPrefix = 'https://rickandmortyapi.com/api/location/';
-
-      if (locationUrl.isEmpty || !locationUrl.startsWith(validUrlPrefix)) {
+      if (locationUrl.isEmpty ||
+          !locationUrl.startsWith(RickAndMortyApiConstants.locationBaseUrl)) {
         throw Exception('Invalid location URL: $locationUrl');
       }
 
-      final locationIdStr = locationUrl.substring(validUrlPrefix.length);
+      final locationIdStr = locationUrl
+          .substring(RickAndMortyApiConstants.locationBaseUrl.length);
 
       final locationId = int.parse(locationIdStr);
 
-      if (locationsMap.containsKey(locationId)) {
-        return locationsMap[locationId]!;
+      //if location exists in cache - return it
+      if (_locationsCache.containsKey(locationId)) {
+        return _locationsCache[locationId]!;
       }
 
+      //if not exists in cache - get location from API
       final locationData = await _get(locationUrl);
 
       final location = Location.fromJson(locationData);
 
-      locationsMap[location.id] = location;
+      //enter location to cache
+      _locationsCache[locationId] = location;
 
       return location;
     } catch (e) {
