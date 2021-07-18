@@ -1,6 +1,8 @@
 import 'dart:math';
 
-class RandomHelper {
+class RandomService {
+  final _rand = Random(DateTime.now().millisecondsSinceEpoch);
+
   /// returns Set in length of [amount] of non-negative random integers uniformly distributed in the range
   /// from 0, inclusive, to [max], exclusive.
   /// [amount] should be <= [max].
@@ -9,10 +11,9 @@ class RandomHelper {
     assert(max > 0);
     assert(amount <= max);
 
-    final rand = Random();
     final randNumbers = Set<int>();
     while (randNumbers.length < amount) {
-      final id = rand.nextInt(max);
+      final id = _rand.nextInt(max);
       randNumbers.add(id);
     }
     return randNumbers;

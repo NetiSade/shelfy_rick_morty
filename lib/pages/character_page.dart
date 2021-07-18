@@ -52,9 +52,12 @@ class CharacterPage extends StatelessWidget {
                             child: CachedNetworkImage(
                               fit: BoxFit.cover,
                               imageUrl: character.image!,
-                              progressIndicatorBuilder:
-                                  (context, url, downloadProgress) =>
-                                      Container(),
+                              placeholder: (context, url) => Container(
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 1,
+                                  color: Colors.grey,
+                                ),
+                              ),
                               errorWidget: (context, url, error) =>
                                   Icon(Icons.error),
                             ),

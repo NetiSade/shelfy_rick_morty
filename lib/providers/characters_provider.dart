@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
 import '../consts.dart';
-import '../helper/random_helper.dart';
 import '../models/character.dart';
 import '../services/api_service.dart';
+import '../services/random_service.dart';
 
 class CharactersProvider with ChangeNotifier {
   final _apiService = GetIt.I<ApiService>();
+  final _rand = GetIt.I<RandomService>();
   bool _hasFetchError = false;
   List<Character>? _characters;
 
@@ -19,7 +20,7 @@ class CharactersProvider with ChangeNotifier {
   Future<void> fetchCharacters() async {
     try {
       _hasFetchError = false;
-      final ids = RandomHelper().getSetOfRandNumbers(
+      final ids = _rand.getSetOfRandNumbers(
         max: RickAndMortyApiConstants.maxCharacterId,
         amount: AppConstants.charactersNumToDisplay,
       );
