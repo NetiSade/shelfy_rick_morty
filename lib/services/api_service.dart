@@ -1,4 +1,3 @@
-import 'dart:collection';
 import 'dart:convert';
 import 'dart:io';
 
@@ -9,9 +8,6 @@ import '../models/character.dart';
 import '../models/location.dart';
 
 class ApiService {
-  //store the locations for reuse. the key is the location URL and the value is the location
-  final HashMap<String, Location> _locationsCache = HashMap();
-
   Future<List<Character>> getCharacters(List<int> idList) async {
     try {
       final charactersData = await _get(
@@ -29,19 +25,8 @@ class ApiService {
 
   Future<Location> getLocation(String locationUrl) async {
     try {
-      //if location exists in cache - return it
-      if (_locationsCache.containsKey(locationUrl)) {
-        return _locationsCache[locationUrl]!;
-      }
-
-      //if not exists in cache - get location from API
       final locationData = await _get(locationUrl);
-
       final location = Location.fromJson(locationData);
-
-      //enter location to cache
-      _locationsCache[locationUrl] = location;
-
       return location;
     } catch (e) {
       print('getLocation failed. error: $e');

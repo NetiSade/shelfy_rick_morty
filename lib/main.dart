@@ -6,6 +6,7 @@ import 'consts.dart';
 import 'pages/character_page.dart';
 import 'pages/home_page.dart';
 import 'providers/characters_provider.dart';
+import 'providers/locations_provider.dart';
 import 'services/api_service.dart';
 import 'services/random_service.dart';
 
@@ -24,6 +25,9 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider.value(
           value: CharactersProvider(),
+        ),
+        ChangeNotifierProvider.value(
+          value: LocationsProvider(),
         ),
       ],
       child: MaterialApp(

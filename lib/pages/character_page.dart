@@ -1,10 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
+import 'package:provider/provider.dart';
+import 'package:shelfy/providers/locations_provider.dart';
 
 import '../consts.dart';
 import '../models/character.dart';
-import '../services/api_service.dart';
 
 class CharacterPage extends StatelessWidget {
   static const routeName = '/character-page';
@@ -128,7 +128,6 @@ class LocationWidget extends StatefulWidget {
 }
 
 class _LocationWidgetState extends State<LocationWidget> {
-  final _apiService = GetIt.I<ApiService>();
   String? _locationType;
   String? _locationDimension;
 
@@ -161,13 +160,15 @@ class _LocationWidgetState extends State<LocationWidget> {
   }
 
   Future<void> _getLocation() async {
-    if (widget.locationUrl == null || widget.locationUrl!.isEmpty) {
+    if (widget.locationUrl == null) {
       print('_getLocation didnt start. locationUrl is null or empty');
       return;
     }
 
     try {
-      final location = await _apiService.getLocation(widget.locationUrl!);
+      final location =
+          await Provider.of<LocationsProvider>(context, listen: false)
+              .getLocation(widget.locationUrl!);
       _locationType = location.type;
       _locationDimension = location.dimension;
     } catch (e) {
