@@ -65,6 +65,7 @@ class _HomePageState extends State<HomePage> {
         color: Colors.white70,
         padding: const EdgeInsets.all(8.0),
         child: ListView.builder(
+          itemExtent: 350,
           itemCount: _characters.length,
           itemBuilder: (context, index) => _buildListItem(_characters[index]),
         ),
@@ -73,41 +74,61 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildListItem(Character character) {
-    return Card(
-      child: ListTile(
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: GestureDetector(
         onTap: () {
           Navigator.of(context).pushNamed(
             CharacterPage.routeName,
             arguments: character,
           );
         },
-        title: Text(
-          character.name ?? AppConstants.unknownDataPlaceholder,
-          style: Theme.of(context)
-              .textTheme
-              .headline6!
-              .copyWith(color: Theme.of(context).primaryColor),
-          overflow: TextOverflow.ellipsis,
-        ),
-        subtitle: Text(
-          'Status: ${character.status ?? AppConstants.unknownDataPlaceholder}',
-          style: Theme.of(context).textTheme.subtitle1,
-        ),
-        //Hero animation for better UX in the navigation
-        trailing: character.image != null
-            ? Hero(
-                tag: character.id,
-                child: CachedNetworkImage(
-                  fit: BoxFit.fitHeight,
-                  imageUrl: character.image!,
-                  placeholder: (context, url) => CircularProgressIndicator(
-                    strokeWidth: 1,
-                    color: Colors.grey,
+        child: Card(
+          child: Stack(
+            children: [
+              if (character.image != null)
+                //Hero animation for better UX in the navigation
+                Positioned.fill(
+                    top: 70,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Hero(
+                        tag: character.id,
+                        child: CachedNetworkImage(
+                          fit: BoxFit.fitHeight,
+                          imageUrl: character.image!,
+                          placeholder: (context, url) => Center(
+                            child: CircularProgressIndicator(
+                              strokeWidth: 1,
+                              color: Colors.grey,
+                            ),
+                          ),
+                          errorWidget: (context, url, error) =>
+                              Icon(Icons.error),
+                        ),
+                      ),
+                    )),
+              Positioned(
+                child: ListTile(
+                  title: Text(
+                    character.name ?? AppConstants.unknownDataPlaceholder,
+                    style: Theme.of(context)
+                        .textTheme
+                        .headline6!
+                        .copyWith(color: Theme.of(context).primaryColor),
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
                   ),
-                  errorWidget: (context, url, error) => Icon(Icons.error),
+                  subtitle: Text(
+                    'Status: ${character.status ?? AppConstants.unknownDataPlaceholder}',
+                    style: Theme.of(context).textTheme.subtitle1,
+                    textAlign: TextAlign.center,
+                  ),
                 ),
-              )
-            : null,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
